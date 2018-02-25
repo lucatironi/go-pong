@@ -71,6 +71,7 @@ func KeyCallback(window *glfw.Window, key glfw.Key, scanCode int, action glfw.Ac
 			game.keys[key] = true
 		} else if action == glfw.Release {
 			game.keys[key] = false
+			game.processedKeys[key] = false
 		}
 	}
 }
