@@ -32,6 +32,7 @@ type Game struct {
 	resourceManager *ResourceManager
 	particles       *ParticleGenerator
 	effects         *PostProcessor
+	text            *TextRenderer
 	paddle1         *GameObject
 	paddle2         *GameObject
 	ball            *BallObject
@@ -53,14 +54,18 @@ func (g *Game) Init() {
 	g.resourceManager.LoadShader("./shaders/sprite.vs", "./shaders/sprite.frag", "sprite")
 	g.resourceManager.LoadShader("./shaders/particle.vs", "./shaders/particle.frag", "particle")
 	g.resourceManager.LoadShader("./shaders/post_processing.vs", "./shaders/post_processing.frag", "postprocessing")
+	g.resourceManager.LoadShader("./shaders/text.vs", "./shaders/text.frag", "text")
 	// Configure shaders
 	projection := mgl.Ortho2D(0.0, float32(g.width), float32(g.height), 0.0)
 	g.resourceManager.GetShader("sprite").Use().SetMatrix4("projection", projection, false)
 	g.resourceManager.GetShader("particle").Use().SetMatrix4("projection", projection, false)
+	g.resourceManager.GetShader("text").Use().SetMatrix4("projection", projection, false)
 	// Set render-specific controls
 	g.renderer = newSpriteRenderer(g.resourceManager.GetShader("sprite"))
 	g.particles = newParticleGenerator(g.resourceManager.GetShader("particle"), 50)
 	g.effects = newPostProcessor(g.resourceManager.GetShader("postprocessing"), int32(g.width), int32(g.height))
+	g.text = newTextRenderer(g.resourceManager.GetShader("text"))
+	g.text.LoadFont("./assets/Roboto-Bold.ttf", 48)
 	// Configure game objects
 	paddle1Position := mgl.Vec2{
 		10,
