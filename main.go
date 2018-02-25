@@ -53,6 +53,7 @@ func main() {
 		// Render
 		gl.ClearColor(0.2, 0.2, 0.2, 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
+
 		game.Draw()
 
 		window.SwapBuffers()
