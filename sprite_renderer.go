@@ -7,17 +7,17 @@ import (
 
 // SpriteRenderer renders a gameOject
 type SpriteRenderer struct {
-	shader  Shader
+	shader  *Shader
 	quadVao uint32
 }
 
 func newSpriteRenderer(shader *Shader) *SpriteRenderer {
-	renderer := &SpriteRenderer{
-		shader: *shader,
+	renderer := SpriteRenderer{
+		shader: shader,
 	}
 	renderer.initRenderData()
 
-	return renderer
+	return &renderer
 }
 
 func (r *SpriteRenderer) initRenderData() {

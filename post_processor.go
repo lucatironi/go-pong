@@ -25,7 +25,7 @@ type Texture2D struct {
 }
 
 func newTexture2D() *Texture2D {
-	tex := Texture2D{
+	texture := Texture2D{
 		internalFormat: gl.RGB,
 		imageFormat:    gl.RGB,
 		wrapS:          gl.REPEAT,
@@ -33,9 +33,9 @@ func newTexture2D() *Texture2D {
 		filterMin:      gl.LINEAR,
 		filterMax:      gl.LINEAR,
 	}
-	gl.GenTextures(1, &tex.ID)
+	gl.GenTextures(1, &texture.ID)
 
-	return &tex
+	return &texture
 }
 
 // Generate generates texture from image data
@@ -70,7 +70,7 @@ func (t *Texture2D) Bind() {
 // It is required to call BeginRender() before rendering the game
 // and EndRender() after rendering the game for the class to work.
 type PostProcessor struct {
-	postProcessingShader       *Shader
+	shader                     *Shader
 	texture                    *Texture2D
 	width, height              int32
 	shake, chaos, confuse      bool
@@ -80,13 +80,13 @@ type PostProcessor struct {
 }
 
 func newPostProcessor(shader *Shader, width, height int32) *PostProcessor {
-	postProcessor := &PostProcessor{
-		postProcessingShader: shader,
-		width:                width,
-		height:               height,
-		shake:                false,
-		chaos:                false,
-		confuse:              false}
+	postProcessor := PostProcessor{
+		shader:  shader,
+		width:   width,
+		height:  height,
+		shake:   false,
+		chaos:   false,
+		confuse: false}
 
 	postProcessor.texture = newTexture2D()
 
@@ -115,7 +115,7 @@ func newPostProcessor(shader *Shader, width, height int32) *PostProcessor {
 
 	// Initialize render data and uniforms
 	postProcessor.initRenderData()
-	postProcessor.postProcessingShader.SetInteger("scene", 0, true)
+	postProcessor.shader.SetInteger("scene", 0, true)
 	offset := float32(1.0 / 300.0)
 	offsets := [][]float32{
 		{-offset, offset},  // top-left
@@ -128,21 +128,21 @@ func newPostProcessor(shader *Shader, width, height int32) *PostProcessor {
 		{0.0, -offset},     // bottom-center
 		{offset, -offset},  // bottom-right
 	}
-	gl.Uniform2fv(postProcessor.postProcessingShader.getUniformLocation("offsets"), 9, &offsets[0][0])
+	gl.Uniform2fv(postProcessor.shader.getUniformLocation("offsets"), 9, &offsets[0][0])
 	edgeKernel := []int32{
 		-1, -1, -1,
 		-1, 8, -1,
 		-1, -1, -1,
 	}
-	gl.Uniform1iv(postProcessor.postProcessingShader.getUniformLocation("edge_kernel"), 9, &edgeKernel[0])
+	gl.Uniform1iv(postProcessor.shader.getUniformLocation("edge_kernel"), 9, &edgeKernel[0])
 	blurKernel := []float32{
 		1.0 / 16, 2.0 / 16, 1.0 / 16,
 		2.0 / 16, 4.0 / 16, 2.0 / 16,
 		1.0 / 16, 2.0 / 16, 1.0 / 16,
 	}
-	gl.Uniform1fv(postProcessor.postProcessingShader.getUniformLocation("blur_kernel"), 9, &blurKernel[0])
+	gl.Uniform1fv(postProcessor.shader.getUniformLocation("blur_kernel"), 9, &blurKernel[0])
 
-	return postProcessor
+	return &postProcessor
 }
 
 // BeginRender prepares the postprocessor's framebuffer operations before rendering the game
@@ -163,11 +163,11 @@ func (pp *PostProcessor) EndRender() {
 // Render renders the PostProcessor texture quad (as a screen-encompassing large sprite)
 func (pp *PostProcessor) Render(time float32) {
 	// Set uniforms/options
-	pp.postProcessingShader.Use()
-	pp.postProcessingShader.SetFloat("time", time, false)
-	pp.postProcessingShader.SetInteger("confuse", boolToInt32(pp.confuse), false)
-	pp.postProcessingShader.SetInteger("chaos", boolToInt32(pp.chaos), false)
-	pp.postProcessingShader.SetInteger("shake", boolToInt32(pp.shake), false)
+	pp.shader.Use()
+	pp.shader.SetFloat("time", time, false)
+	pp.shader.SetInteger("confuse", boolToInt32(pp.confuse), false)
+	pp.shader.SetInteger("chaos", boolToInt32(pp.chaos), false)
+	pp.shader.SetInteger("shake", boolToInt32(pp.shake), false)
 	// Render textured quad
 	gl.ActiveTexture(gl.TEXTURE0)
 	pp.texture.Bind()
