@@ -25,7 +25,12 @@ func (o *GameObject) Draw(renderer *SpriteRenderer) {
 	renderer.Draw(o.position, o.size, o.rotation, o.color)
 }
 
-// CheckCollision checks collisions between two game objects using AABB - AABB
+// Reset resets a GameObject
+func (o *GameObject) Reset(position mgl.Vec2) {
+	o.position = position
+}
+
+// CheckCollision checks collisions between two game objects using o - AABB
 func (o *GameObject) CheckCollision(other *GameObject) bool {
 	// Collision x-axis?
 	collisionX := o.position.X()+o.size.X() >= other.position.X() &&
