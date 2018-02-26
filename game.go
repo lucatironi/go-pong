@@ -15,12 +15,11 @@ const (
 )
 
 var (
-	paddleSize     = mgl.Vec2{20, 100}
-	paddleVelocity = float32(500)
-
+	maxScore       		= 10
+	shakeTime 	   		= 0.0
+	paddleSize     		= mgl.Vec2{20, 100}
+	paddleVelocity 		= float32(500)
 	initialBallVelocity = mgl.Vec2{450.0, 300.0}
-
-	shakeTime = 0.0
 )
 
 // Game represents a game uber object
@@ -43,7 +42,7 @@ type Game struct {
 
 func newGame(width, height int) *Game {
 	return &Game{
-		state:        gameActive,
+		state:        gameMenu,
 		keys:         make(map[glfw.Key]bool),
 		width:        width,
 		height:       height,
@@ -80,7 +79,7 @@ func (g *Game) Init() {
 		float32(g.width) - paddleSize.X() - 10,
 		float32(g.height/2) - paddleSize.Y()/2}
 	g.paddle2 = newGameObject(paddle2Position, paddleSize)
-	g.ball = newBallObject(mgl.Vec2{float32(g.width / 2), float32(g.height / 2)}, 10.0, initialBallVelocity)
+	g.ball = newBallObject(mgl.Vec2{float32(g.width/2)-10, float32(g.height/2)-10}, 10, initialBallVelocity)
 }
 
 // ProcessInput processes the input
@@ -88,7 +87,7 @@ func (g *Game) ProcessInput(deltaTime float64) {
 	switch g.state {
 	case gameMenu:
 		if g.keys[glfw.KeyEnter] {
-			g.reset()
+			g.Reset()
 			g.state = gameActive
 			g.processedKeys[glfw.KeyEnter] = true
 		}
@@ -151,8 +150,8 @@ func (g *Game) Update(deltaTime float64) {
 			g.ball.Reset(mgl.Vec2{float32(g.width / 2), float32(g.height / 2)}, initialBallVelocity)
 		}
 
-		if g.paddle1Score >= 3 || g.paddle2Score >= 3 {
-			g.state = gameMenu
+		if g.paddle1Score >= maxScore || g.paddle2Score >= maxScore {
+			g.state = gameWin
 		}
 	}
 }
@@ -176,11 +175,17 @@ func (g *Game) Draw() {
 		// Render text
 		g.text.RenderText(float32(g.width/2)-50, 50, 1, mgl.Vec3{1.0, 1.0, 1.0}, "%v : %v", g.paddle1Score, g.paddle2Score)
 	}
-	if g.state == gameMenu {
-		g.text.RenderText(250, float32(g.height/2), 0.5, mgl.Vec3{1.0, 1.0, 1.0}, "Press ENTER to start")
+	if g.state == gameMenu || g.state == gameWin {
+		g.text.RenderText(290, float32(g.height/2)-20, 0.5, mgl.Vec3{1.0, 1.0, 1.0}, "Press ENTER to start")
 	}
 	if g.state == gameWin {
-
+		var winText string
+		if g.paddle1Score > g.paddle2Score {
+			winText = "Player 1 Won!"
+		} else {
+			winText = "Player 2 Won!"
+		}
+		g.text.RenderText(330, float32(g.height/2)-50, 0.5, mgl.Vec3{1.0, 1.0, 1.0}, winText)
 	}
 }
 
@@ -193,8 +198,11 @@ func (g *Game) DoCollisions() {
 	}
 }
 
-func (g *Game) reset() {
+// Reset resets the game to initial conditions
+func (g *Game) Reset() {
 	g.paddle1Score = 0
 	g.paddle2Score = 0
+	g.paddle1.Reset(mgl.Vec2{10, float32(g.height/2) - paddleSize.Y()/2})
+	g.paddle2.Reset(mgl.Vec2{float32(g.width) - paddleSize.X() - 10, float32(g.height/2) - paddleSize.Y()/2})
 	g.ball.Reset(mgl.Vec2{float32(g.width / 2), float32(g.height / 2)}, initialBallVelocity)
 }
