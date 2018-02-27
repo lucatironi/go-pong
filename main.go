@@ -13,10 +13,7 @@ const (
 	windowHeight = 600
 )
 
-var (
-	game                 *Game
-	deltaTime, lastFrame float64
-)
+var game *Game
 
 func init() {
 	// This is needed to arrange that main() runs on main thread.
@@ -38,6 +35,8 @@ func main() {
 
 	game = newGame(windowWidth, windowHeight)
 	game.Init()
+
+	var deltaTime, lastFrame float64
 
 	for !window.ShouldClose() {
 		currentFrame := glfw.GetTime()
