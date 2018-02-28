@@ -45,14 +45,12 @@ func (o *GameObject) CheckCollision(other *GameObject) bool {
 // BallObject is a special game object to handle the ball
 type BallObject struct {
 	GameObject
-	isStuck bool
-	radius  float32
+	radius float32
 }
 
 func newBallObject(position mgl.Vec2, radius float32, velocity mgl.Vec2) *BallObject {
 	return &BallObject{
-		isStuck: false,
-		radius:  radius,
+		radius: radius,
 		GameObject: GameObject{
 			position: position,
 			size:     mgl.Vec2{radius * 2, radius * 2},
@@ -63,18 +61,14 @@ func newBallObject(position mgl.Vec2, radius float32, velocity mgl.Vec2) *BallOb
 
 // Move moves the ball
 func (b *BallObject) Move(deltaTime float64, windowWidth, windowHeight int) mgl.Vec2 {
-	// If not stuck to player board
-	if !b.isStuck {
-		// Move the ball
-		b.position = b.position.Add(b.velocity.Mul(float32(deltaTime)))
-		// Check if outside window bounds; if so, reverse velocity and restore at correct position
-		if b.position.Y() <= 0.0 {
-			b.velocity[1] = -b.velocity.Y()
-			b.position[1] = 0.0
-		} else if b.position.Y()+b.size.Y() >= float32(windowHeight) {
-			b.velocity[1] = -b.velocity.Y()
-			b.position[1] = float32(windowHeight) - b.size.Y()
-		}
+	b.position = b.position.Add(b.velocity.Mul(float32(deltaTime)))
+	// Check if outside window bounds; if so, reverse velocity and restore at correct position
+	if b.position.Y() <= 0.0 {
+		b.velocity[1] = -b.velocity.Y()
+		b.position[1] = 0.0
+	} else if b.position.Y()+b.size.Y() >= float32(windowHeight) {
+		b.velocity[1] = -b.velocity.Y()
+		b.position[1] = float32(windowHeight) - b.size.Y()
 	}
 
 	return b.position

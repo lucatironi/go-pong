@@ -15,10 +15,10 @@ const (
 )
 
 var (
-	maxScore       		= 10
-	shakeTime 	   		= 0.0
-	paddleSize     		= mgl.Vec2{20, 100}
-	paddleVelocity 		= float32(500)
+	maxScore            = 10
+	shakeTime           = 0.0
+	paddleSize          = mgl.Vec2{20, 100}
+	paddleVelocity      = float32(500)
 	initialBallVelocity = mgl.Vec2{450.0, 300.0}
 )
 
@@ -79,7 +79,7 @@ func (g *Game) Init() {
 		float32(g.width) - paddleSize.X() - 10,
 		float32(g.height/2) - paddleSize.Y()/2}
 	g.paddle2 = newGameObject(paddle2Position, paddleSize)
-	g.ball = newBallObject(mgl.Vec2{float32(g.width/2)-10, float32(g.height/2)-10}, 10, initialBallVelocity)
+	g.ball = newBallObject(mgl.Vec2{float32(g.width/2) - 10, float32(g.height/2) - 10}, 10, initialBallVelocity)
 }
 
 // ProcessInput processes the input
@@ -191,7 +191,7 @@ func (g *Game) Draw() {
 
 // DoCollisions checks if gameobjects collided
 func (g *Game) DoCollisions() {
-	if !g.ball.isStuck && (g.ball.CheckCollision(g.paddle1) || g.ball.CheckCollision(g.paddle2)) {
+	if g.ball.CheckCollision(g.paddle1) || g.ball.CheckCollision(g.paddle2) {
 		shakeTime = 0.1
 		g.effects.shake = true
 		g.ball.velocity[0] = -g.ball.velocity.X()
