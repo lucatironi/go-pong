@@ -28,8 +28,6 @@ func main() {
 	initOpenGL()
 
 	// OpenGL configuration
-	gl.Viewport(0, 0, windowWidth, windowHeight)
-	gl.Enable(gl.CW)
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
@@ -75,6 +73,12 @@ func KeyCallback(window *glfw.Window, key glfw.Key, scanCode int, action glfw.Ac
 	}
 }
 
+// FramebufferSizeCallback defines the callback to handle resize of the window
+func FramebufferSizeCallback(window *glfw.Window, _, _ int) {
+	width, height := window.GetFramebufferSize()
+	gl.Viewport(0, 0, int32(width), int32(height))
+}
+
 // initGlfw initializes glfw and returns a glfw.Window to use.
 func initGlfw() *glfw.Window {
 	if err := glfw.Init(); err != nil {
@@ -93,6 +97,7 @@ func initGlfw() *glfw.Window {
 	window.MakeContextCurrent()
 
 	window.SetKeyCallback(KeyCallback)
+	window.SetFramebufferSizeCallback(FramebufferSizeCallback)
 
 	return window
 }
